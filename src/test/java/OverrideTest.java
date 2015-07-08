@@ -11,9 +11,6 @@ import java.util.Map;
 public class OverrideTest {
     @Test
     public void test() {
-        GenericModel.declareProperty("name", String.class);
-        GenericModel.declareProperty("count", int.class);
-
         // create new instead of use singleton
         ModelConverters converters = new ModelConverters();
         converters.addConverter(new GericModelConverter());

@@ -4,9 +4,11 @@ import io.swagger.jackson.AbstractModelConverter;
 import io.swagger.models.Model;
 import io.swagger.models.ModelImpl;
 import io.swagger.models.properties.Property;
+import io.swagger.models.properties.RefProperty;
 import io.swagger.util.Json;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -26,12 +28,16 @@ public class GericModelConverter extends AbstractModelConverter {
     public Model resolve(Type type, ModelConverterContext context, Iterator<ModelConverter> next) {
         if (type instanceof Class<?>) {
             Class<?> cls = (Class<?>) type;
+            System.out.println("cls.getName(): " + cls.getName());
             if (GenericModel.class.isAssignableFrom(cls)) {
                 ModelImpl impl = new ModelImpl();
                 impl.setName(cls.getSimpleName());
-                for (Entry<String, Class<?>> entry : GenericModel.getDeclaredProperties().entrySet()) {
-                    impl.addProperty(entry.getKey(), context.resolveProperty(entry.getValue(), null));
+
+                for (Field field : cls.getDeclaredFields()) {
+                    System.out.println("field.getName(): " + field.getName());
+                    impl.addProperty(field.getName(), context.resolveProperty(field.getType(), null));
                 }
+
                 context.defineModel(impl.getName(), impl);
                 return impl;
             }
