@@ -14,7 +14,7 @@ public class OverrideTest {
         // create new instead of use singleton
         ModelConverters converters = new ModelConverters();
         converters.addConverter(new GericModelConverter());
-        Map<String, Model> read = converters.read(GenericModel.class);
+        Map<String, Model> read = converters.readAll(GenericModel.class);
 
         Json.prettyPrint(read);
     }
