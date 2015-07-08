@@ -25,7 +25,7 @@ public class GericModelConverter extends AbstractModelConverter {
     }
 
     @Override
-    public Model resolve(Type type, ModelConverterContext context, Iterator<ModelConverter> next) {
+    public Model resolve(Type type, ModelConverterContext context, Iterator<ModelConverter> converters) {
         if (type instanceof Class<?>) {
             Class<?> cls = (Class<?>) type;
             System.out.println("cls.getName(): " + cls.getName());
@@ -35,6 +35,7 @@ public class GericModelConverter extends AbstractModelConverter {
 
                 for (Field field : cls.getDeclaredFields()) {
                     System.out.println("field.getName(): " + field.getName());
+                    System.out.println(field.getType());
                     impl.addProperty(field.getName(), context.resolveProperty(field.getType(), null));
                 }
 
@@ -42,6 +43,11 @@ public class GericModelConverter extends AbstractModelConverter {
                 return impl;
             }
         }
-        return null;
+        Model resolved = null;
+        if (converters.hasNext()) {
+            ModelConverter converter = converters.next();
+            resolved = converter.resolve(type, context, converters);
+        }
+        return resolved;
     }
 }
