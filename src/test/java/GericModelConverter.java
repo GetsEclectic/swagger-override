@@ -30,17 +30,26 @@ public class GericModelConverter extends AbstractModelConverter {
             Class<?> cls = (Class<?>) type;
             System.out.println("cls.getName(): " + cls.getName());
             if (GenericModel.class.isAssignableFrom(cls)) {
-                ModelImpl impl = new ModelImpl();
-                impl.setName(cls.getSimpleName());
+                String dataImplName = cls.getSimpleName() + "Data";
+
+                ModelImpl dataImpl = new ModelImpl();
+                dataImpl.setName(dataImplName);
 
                 for (Field field : cls.getDeclaredFields()) {
                     System.out.println("field.getName(): " + field.getName());
                     System.out.println(field.getType());
-                    impl.addProperty(field.getName(), context.resolveProperty(field.getType(), null));
+                    dataImpl.addProperty(field.getName(), context.resolveProperty(field.getType(), null));
                 }
 
-                context.defineModel(impl.getName(), impl);
-                return impl;
+
+                context.defineModel(dataImplName, dataImpl);
+
+                ModelImpl genericImpl = new ModelImpl();
+                dataImpl.setName(cls.getSimpleName());
+                RefProperty dataProperty = new RefProperty(dataImplName);
+                genericImpl.addProperty("data", dataProperty);
+                context.defineModel(cls.getSimpleName(), genericImpl);
+                return genericImpl;
             }
         }
         Model resolved = null;
